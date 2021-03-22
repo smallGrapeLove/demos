@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+    <!-- 设置编码格式，防止上传的文件名为中文时是乱码 -->
+    <constant name="struts.i18n.encoding" value="UTF-8"/>
+    <!-- 指定resource资源文件的名称-->
+    <constant name="struts.custom.i18n.resources" value="message"/>
+    <!-- 设置上传文件的总大小(单位：字节)，默认是10M -->
+    <constant name="struts.multipart.maxSize" value="104857600"/>
+
+    <package name="struts" extends="struts-default">
+        <!-- 配置上传的拦截器 -->
+        <interceptors>
+            <interceptor-stack name="myStack">
+                <!-- 配置上传的拦截器 -->
+                <interceptor-ref name="fileUpload">
+                    <!-- 限制上传的文件类型,这里限制为只能上传各种图片类型 -->
+                    <!--<param name="allowedTypes">image/bmp,image/png,image/jpg,image/jpeg</param>-->
+                    <!-- 限制上传文件的大小(单位是字节)-->
+                    <!--<param name="maximumSize">2097152</param>-->
+                </interceptor-ref>
+                <!-- 引用默认的拦截器栈 -->
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+        </interceptors>
+
+        <!-- 普通上传 -->
+        <action name="upload" class="com.xuhuan.fileupload.action.UploadAction" method="upload">
+            <!-- 引用拦截器 -->
+            <interceptor-ref name="myStack"/>
+            <!-- 上传成功后跳转的页面 -->
+            <result>file_list.jsp</result>
+
+            <!-- 上传失败或有错误的提示页面,
+            name="input"表示当有错误信息的时候要跳转到的提示页面-->
+            <result name="input">upload.jsp</result>
+        </action>
+
+        <!-- 文件下载 -->
+        <action name="download" class="com.xuhuan.fileupload.action.DownloadAction" method="download">
+            <!-- 文件下载的结果集类型使用stream，表示一个流 -->
+            <result type="stream">
+                <!-- 设置一些下载的参数配置 -->
+                <!-- contentType表示设置response的响应类型,这里设置为流类型 -->
+                <param name="contentType">application/octet-stream</param>
+                <!-- contentDisposition指定响应回客户端的下载的文件名,
+                ${fileName}引用action中定义的fileName属性-->
+                <param name="contentDisposition">attachment;filename="${fileName}"</param>
+                <!-- inputName指定action中定义的getXxx方法，去掉get并将首字母改成小写 -->
+                <param name="inputName">inputStream</param>
+                <!-- 下载文件的缓冲大小(可选) -->
+                <param name="bufferSize">4096</param>
+            </result>
+        </action>
+
+        <action name="excelAction" class="com.xuhuan.fileupload.action.excel.ExcelAction" method="excelDemo">
+            <result name="success">index.jsp</result>
+        </action>
+    </package>
+</struts>
+
