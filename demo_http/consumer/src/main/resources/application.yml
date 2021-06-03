@@ -1,0 +1,5 @@
+server:
+  port: 1002
+
+provider:
+  url: http://localhost:1001
