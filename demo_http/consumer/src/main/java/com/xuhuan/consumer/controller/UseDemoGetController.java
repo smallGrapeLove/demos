@@ -1,5 +1,6 @@
 package com.xuhuan.consumer.controller;
 
+import com.xuhuan.consumer.util.HttpCallUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author huan.xu
@@ -39,10 +39,8 @@ public class UseDemoGetController {
         String url = providerUrl + "/demo-get/getMethod?name={name}";
         Map<String, Object> map = new HashMap<>();
         map.put("name", name);
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class, map);
-        HttpStatus statusCode = responseEntity.getStatusCode();
-        String body = responseEntity.getBody();
-        log.info("调用服务提供者接口[{}]，状态[{}]，结果[{}]", url, statusCode, body);
+
+        String body = HttpCallUtil.sendGet(restTemplate, url, map);
         return body;
     }
 }

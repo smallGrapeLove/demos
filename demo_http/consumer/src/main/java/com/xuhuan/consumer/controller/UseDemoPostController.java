@@ -1,6 +1,8 @@
 package com.xuhuan.consumer.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.xuhuan.common.entity.User;
+import com.xuhuan.consumer.util.HttpCallUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,9 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -35,30 +35,25 @@ public class UseDemoPostController {
 
     @GetMapping("/getMethod")
     @ResponseBody
-    public String getMethod(String name) {
-        log.info("请求参数[{}]",name);
-        String url = providerUrl + "/demo-post/getMethod?name={name}";
-        MultiValueMap map = new LinkedMultiValueMap();
-        map.add("name", name);
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, map, String.class);
-        HttpStatus statusCode = responseEntity.getStatusCode();
-        String body = responseEntity.getBody();
-        log.info("调用服务提供者接口[{}]，状态[{}]，结果[{}]", url, statusCode, body);
-        return body;
-    }
-
-    @GetMapping("/getMethod1")
-    @ResponseBody
-    public String getMethod1() {
+    public String getMethod() {
         String url = providerUrl + "/demo-post/getMethod1";
         User user=new User();
         user.setName("张三");
         user.setAge(18);
 
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, user, String.class);
-        HttpStatus statusCode = responseEntity.getStatusCode();
-        String body = responseEntity.getBody();
-        log.info("调用服务提供者接口[{}]，状态[{}]，结果[{}]", url, statusCode, body);
+        String body = HttpCallUtil.sendPost(restTemplate, url, user);
+
+        return body;
+    }
+
+    @PostMapping("/getMethod1")
+    @ResponseBody
+    public String getMethod1(@RequestBody User user){
+        String url = providerUrl + "/demo-post/getMethod1";
+        String body = HttpCallUtil.sendPost(restTemplate, url, user);
+        JSONObject jsonObject = JSONObject.parseObject(body);
+        log.info("返回结果格式化为JSON格式[{}]",jsonObject);
+
         return body;
     }
 }
